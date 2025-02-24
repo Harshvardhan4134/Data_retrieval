@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">AI Document Management System</h1>
+            {% if current_user.is_authenticated %}
+                <p>Welcome back, {{ current_user.username }}!</p>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+            {% else %}
+                <p>Please login to continue.</p>
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="document-viewer">
+                {% if document.file_type == 'pdf' %}
+                <canvas id="pdf-viewer"></canvas>
+                {% elif document.file_type == 'xlsx' %}
+                <div id="excel-viewer" class="table-responsive"></div>
+                {% else %}
+                <pre id="text-viewer">{{ content }}</pre>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileType = '{{ document.file_type }}';
+        const fileContent = '{{ content|tojson|safe }}';
+
+        if (fileType === 'pdf') {
+            const canvas = document.getElementById('pdf-viewer');
+            pdfjsLib.getDocument({data: atob(fileContent)}).promise.then(function(pdf) {
+                pdf.getPage(1).then(function(page) {
+                    const viewport = page.getViewport({scale: 1.5});
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    });
+                });
+            });
+        } else if (fileType === 'xlsx') {
+            const viewer = document.getElementById('excel-viewer');
+            viewer.innerHTML = fileContent;
+        } else if (fileType === 'json') {
+            const viewer = document.getElementById('text-viewer');
+            viewer.textContent = JSON.stringify(JSON.parse(fileContent), null, 2);
+        }
+    });
+</script>
+{% endblock %}
